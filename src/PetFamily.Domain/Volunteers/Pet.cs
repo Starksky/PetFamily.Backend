@@ -29,12 +29,12 @@ public class Pet : AuditEntity<PetId>
         BreedId = breedId;
     }
     
-    public static Result<Pet> Create(PetId id, string name, SpeciesId speciesId, BreedId breedId)
+    public static Result<Pet, Error> Create(PetId id, string name, SpeciesId speciesId, BreedId breedId)
     {
         if (string.IsNullOrWhiteSpace(name))
-            return Result.Failure<Pet>("Name cannot be empty");
+            return Errors.General.Validation(nameof(Name));
 
-        return Result.Success(new Pet(id, name, speciesId, breedId));
+        return new Pet(id, name, speciesId, breedId);
     }
     
     //Required

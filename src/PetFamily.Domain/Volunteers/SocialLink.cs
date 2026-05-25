@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteers;
 
@@ -10,14 +11,14 @@ public record SocialLink
         Url = url;
     }
     
-    public static Result<SocialLink> Create(string name, string url)
+    public static Result<SocialLink, Error> Create(string name, string url)
     {
         if (string.IsNullOrWhiteSpace(name))
-            return Result.Failure<SocialLink>("Name is required");
+            return Errors.General.Validation(nameof(Name));
         if (string.IsNullOrWhiteSpace(url))
-            return Result.Failure<SocialLink>("Url is required");
+            return Errors.General.Validation(nameof(Url));
 
-        return Result.Success(new SocialLink(name, url));
+        return new SocialLink(name, url);
     }
     
     public string Name { get; }

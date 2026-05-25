@@ -21,18 +21,16 @@ public class PetConfiguration : AuditEntityConfiguration<Pet>
             .HasConversion(id => id.Value,
                 value => PetId.Create(value));
 
-        builder.Property(p => p.Name)
-            .IsRequired()
-            .HasMaxLength(Constants.MaxLengthLowText);
-        
         builder.Property(p => p.SpeciesId)
             .IsRequired()
-            .HasConversion(id => id.Value,
+            .HasConversion(
+                id => id.Value,
                 value => SpeciesId.Create(value));
         
         builder.Property(p => p.BreedId)
             .IsRequired()
-            .HasConversion(id => id.Value,
+            .HasConversion(
+                id => id.Value,
                 value => BreedId.Create(value));
         
         builder.OwnsOne(x => x.PetDetails, ownsBuilder =>

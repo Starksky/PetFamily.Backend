@@ -1,10 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
+using PetFamily.Application.Species;
+using PetFamily.Domain.Shared;
 using PetFamily.Domain.Species;
 
 namespace PetFamily.Infrastructure.Repositories;
 
-public class SpeciesRepository
+public class SpeciesRepository : ISpeciesRepository
 {
     private readonly ApplicationDbContext _dbContext;
     
@@ -25,11 +27,11 @@ public class SpeciesRepository
         return entity.Id;
     }
 
-    public async Task<Result<Species>> GetById(SpeciesId id, CancellationToken cancellationToken = default)
+    public async Task<Result<Species, Error>> GetById(SpeciesId id, CancellationToken cancellationToken = default)
     {
         var find = await _dbContext.Species.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
         if (find == null)
-            return Result.Failure<Species>("Species not found");
-        return Result.Success(find);
+            return Errors.General.NotFound(id);
+        return find;
     }
 }

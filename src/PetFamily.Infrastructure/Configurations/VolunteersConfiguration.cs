@@ -34,15 +34,22 @@ public class VolunteersConfiguration : IEntityTypeConfiguration<Volunteer>
                 .IsRequired(false)
                 .HasMaxLength(Constants.MaxLengthLowValueText);
         });
+
+        builder.ComplexProperty(x => x.Phone, propertyBuilder =>
+        {
+            propertyBuilder.IsRequired();
+            propertyBuilder.Property(p => p.Value)
+                .IsRequired()
+                .HasMaxLength(Constants.MaxLengthLowValueText);
+        });
         
-        builder.Property(x => x.Phone)
-            .IsRequired()
-            .HasMaxLength(Constants.MaxLengthLowValueText);
-        
-        builder.Property(x => x.Email)
-            .IsRequired()
-            .HasMaxLength(Constants.MaxLengthLowValueText);
-        
+        builder.ComplexProperty(x => x.Email, propertyBuilder =>
+        {
+            propertyBuilder.IsRequired();
+            propertyBuilder.Property(p => p.Value)
+                .IsRequired()
+                .HasMaxLength(Constants.MaxLengthLowValueText);
+        });
         
         builder.Property(x => x.Description)
             .IsRequired(false)

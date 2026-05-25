@@ -12,10 +12,10 @@ public abstract class AuditEntityConfiguration<TEntity>
     {
         builder.Property(e => e.CreatedAt)
             .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql("now() at time zone 'utc'");
         
         builder.Property(e => e.UpdatedAt)
             .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql("now() at time zone 'utc'");
     }
 }

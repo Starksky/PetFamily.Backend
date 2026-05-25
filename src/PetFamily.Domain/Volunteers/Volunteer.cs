@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteers;
 
@@ -8,28 +9,17 @@ public sealed class Volunteer : Entity<VolunteerId>
     
     private Volunteer(VolunteerId id) : base(id) { }
     
-    private Volunteer(VolunteerId id, Fio fio, string email, string phone) : base(id)
+    public Volunteer(VolunteerId id, Fio fio, Email email, Phone phone) : base(id)
     {
         Fio = fio;
         Email = email;
         Phone = phone;
     }
     
-    public static Result<Volunteer> Create(VolunteerId id, Fio fio, string email, string phone)
-    {
-         if (string.IsNullOrWhiteSpace(email))
-             return Result.Failure<Volunteer>("Email is required");
-         if (string.IsNullOrWhiteSpace(phone))
-             return Result.Failure<Volunteer>("Phone is required");
-
-         var result = new Volunteer(id, fio, email, phone);
-         return Result.Success(result);
-    }
-    
     //Required
     public Fio Fio { get; private set; } = null!;
-    public string Email { get; private set; } = null!;
-    public string Phone { get; private set; } = null!;
+    public Email Email { get; private set; } = null!;
+    public Phone Phone { get; private set; } = null!;
     public IReadOnlyList<Pet> Pets => _pets;
     
     

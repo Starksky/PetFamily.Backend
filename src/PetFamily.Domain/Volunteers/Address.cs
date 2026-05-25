@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteers;
 
@@ -22,21 +23,22 @@ public record Address
         ApartmentNumber = apartmentNumber;
     }
     
-    public static Result<Address> Create(string postalCode, string city, string street, int buildingNumber, 
+    public static Result<Address, Error> Create(string postalCode, string city, string street, int buildingNumber, 
         int? buildingNumberTwo, int? apartmentNumber)
     {
         if (string.IsNullOrWhiteSpace(postalCode))
-            return Result.Failure<Address>("Postal code is required.");
+            return Errors.General.Validation(nameof(PostalCode));
         if (string.IsNullOrWhiteSpace(city))
-            return Result.Failure<Address>("City is required.");
+            return Errors.General.Validation(nameof(City));
         if (string.IsNullOrWhiteSpace(street))
-            return Result.Failure<Address>("Street is required.");
+            return Errors.General.Validation(nameof(Street));
+        
         if (buildingNumber > 1000 || buildingNumberTwo > 1000)
-            return Result.Failure<Address>("Building number is greater than 1000");
+            return Errors.General.Validation(nameof(BuildingNumber));
         if (apartmentNumber > 1000)
-            return Result.Failure<Address>("Apartment number is greater than 1000");
+            return Errors.General.Validation(nameof(ApartmentNumber));
 
-        return Result.Success(new Address(postalCode, city, street, buildingNumber, 
-            buildingNumberTwo, apartmentNumber));
+        return new Address(postalCode, city, street, buildingNumber, 
+            buildingNumberTwo, apartmentNumber);
     }
 }

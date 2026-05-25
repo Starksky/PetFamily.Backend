@@ -28,13 +28,13 @@ namespace PetFamily.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    email = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    phone = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     description = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
                     job_age = table.Column<int>(type: "integer", nullable: true),
+                    email_value = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     fio_first_name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     fio_last_name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     fio_patronymic = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    phone_value = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     volunteer_details = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
@@ -65,7 +65,7 @@ namespace PetFamily.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
                     species_id = table.Column<Guid>(type: "uuid", nullable: false),
                     breed_id = table.Column<Guid>(type: "uuid", nullable: false),
                     description = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
@@ -84,8 +84,8 @@ namespace PetFamily.Infrastructure.Migrations
                     address_city = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     address_postal_code = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     address_street = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now() at time zone 'utc'"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now() at time zone 'utc'"),
                     pet_details = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>

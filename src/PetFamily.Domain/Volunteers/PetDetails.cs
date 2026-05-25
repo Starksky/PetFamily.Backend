@@ -2,8 +2,13 @@
 
 public record PetDetails
 {
-    private readonly List<Photo> _photos = [];
-    private readonly List<Requisite> _requisites = [];
-    public IReadOnlyList<Requisite> Requisites => _requisites;
-    public IReadOnlyList<Photo> Photos => _photos;
+    public IReadOnlyList<Requisite> Requisites { get; }
+    public IReadOnlyList<Photo> Photos { get; }
+
+    private PetDetails() { }
+    public PetDetails(IEnumerable<Requisite> requisites, IEnumerable<Photo> photos)
+    {
+        Requisites = requisites.ToList();
+        Photos = photos.ToList();
+    }
 }

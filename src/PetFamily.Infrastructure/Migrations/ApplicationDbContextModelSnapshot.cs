@@ -89,7 +89,7 @@ namespace PetFamily.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasDefaultValueSql("now() at time zone 'utc'");
 
                     b.Property<string>("Description")
                         .HasMaxLength(2048)
@@ -120,8 +120,7 @@ namespace PetFamily.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("text")
                         .HasColumnName("name");
 
                     b.Property<Guid>("SpeciesId")
@@ -132,7 +131,7 @@ namespace PetFamily.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasDefaultValueSql("now() at time zone 'utc'");
 
                     b.Property<double?>("Weight")
                         .HasColumnType("double precision")
@@ -195,21 +194,20 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasColumnType("character varying(2048)")
                         .HasColumnName("description");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("email");
-
                     b.Property<int?>("JobAge")
                         .HasColumnType("integer")
                         .HasColumnName("job_age");
 
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("phone");
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Email", "PetFamily.Domain.Volunteers.Volunteer.Email#Email", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(64)
+                                .HasColumnType("character varying(64)")
+                                .HasColumnName("email_value");
+                        });
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Fio", "PetFamily.Domain.Volunteers.Volunteer.Fio#Fio", b1 =>
                         {
@@ -231,6 +229,17 @@ namespace PetFamily.Infrastructure.Migrations
                                 .HasMaxLength(64)
                                 .HasColumnType("character varying(64)")
                                 .HasColumnName("fio_patronymic");
+                        });
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Phone", "PetFamily.Domain.Volunteers.Volunteer.Phone#Phone", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(64)
+                                .HasColumnType("character varying(64)")
+                                .HasColumnName("phone_value");
                         });
 
                     b.HasKey("Id")

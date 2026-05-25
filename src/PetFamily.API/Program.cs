@@ -1,5 +1,7 @@
-//using PetFamily.API;
+using PetFamily.API.Validation;
+using PetFamily.Application;
 using PetFamily.Infrastructure;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,9 +11,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddInfrastructure();
+builder.Services.AddApplication();
+builder.Services.AddFluentValidationAutoValidation(configuration =>
+{
+    configuration.OverrideDefaultResultFactoryWith<CustomResultFactory>();
+});
+
+
 builder.Services.AddControllers();
 
-builder.Services.AddScoped<ApplicationDbContext>();
 
 var app = builder.Build();
 
@@ -27,32 +36,3 @@ app.UseHttpsRedirection();
 //app.UseAuthorization();
 app.MapControllers();
 app.Run();
-
-/*var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
-
-
-
-namespace PetFamily.API
-{
-    record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-    {
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-    }
-}*/
