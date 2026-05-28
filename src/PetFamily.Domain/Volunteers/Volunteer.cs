@@ -3,8 +3,10 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteers;
 
-public sealed class Volunteer : Entity<VolunteerId>
+public sealed class Volunteer : AuditEntity<VolunteerId>, ISoftDelete
 {
+    private bool _isDeleted = false;
+    
     private readonly List<Pet> _pets = [];
     
     private Volunteer(VolunteerId id) : base(id) { }
@@ -24,12 +26,45 @@ public sealed class Volunteer : Entity<VolunteerId>
     
     
     //NotRequired
-    public string? Description { get; private set; }
-    public int? JobAge { get; private set; }
+    public Description? Description { get; private set; }
+    public JobAge? JobAge { get; private set; }
     public VolunteerDetails? VolunteerDetails { get; private set; }
     
 
     public int GetCountSuccessPets() => _pets.Count(p => p.HelpStatus == HelpStatus.Success);
     public int GetCountNeedHomePets() => _pets.Count(p => p.HelpStatus == HelpStatus.NeedHome);
     public int GetCountNeedHelpPets() => _pets.Count(p => p.HelpStatus == HelpStatus.NeedHelp);
+
+    public void Delete() 
+    {
+        if (_isDeleted)
+            return;
+        
+        //auto delete ef
+        //_pets.ForEach(p => p.Delete());
+        _isDeleted = true;
+    }
+
+    public void Restore()
+    {
+        if (!_isDeleted)
+            return;
+        
+        //auto restore ef
+        //_pets.ForEach(p => p.Restore());
+        _isDeleted = false;
+    }
+    
+    public void UpdateInfo(Description description, JobAge jobAge)
+    {
+        Description = description;
+        JobAge = jobAge;
+    }
+    
+    public UnitResult<Error> AddPets(IEnumerable<Pet> pets)
+    {
+        _pets.AddRange(pets);
+
+        return Result.Success<Error>();
+    }
 }

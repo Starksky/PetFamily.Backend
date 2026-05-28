@@ -4,10 +4,13 @@ using Microsoft.Extensions.Logging;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Species;
 using PetFamily.Domain.Volunteers;
+using PetFamily.Infrastructure.Interceptors;
 
 namespace PetFamily.Infrastructure;
 
-public class ApplicationDbContext(IConfiguration configuration) : DbContext
+public class ApplicationDbContext(IConfiguration configuration,
+    SoftDeleteInterceptor softDeleteInterceptor,
+    AuditInterceptor auditInterceptor) : DbContext
 {
     private const string ConnectionKey = "Database";
 
@@ -19,27 +22,21 @@ public class ApplicationDbContext(IConfiguration configuration) : DbContext
     {
         optionsBuilder.UseNpgsql(configuration.GetConnectionString(ConnectionKey));
         optionsBuilder.UseSnakeCaseNamingConvention();
+        optionsBuilder.EnableSensitiveDataLogging();
         optionsBuilder.UseLoggerFactory(CreateLoggerFactory());
+
+        optionsBuilder.AddInterceptors(softDeleteInterceptor);
+        optionsBuilder.AddInterceptors(auditInterceptor);
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+    {
+        return base.SaveChangesAsync(cancellationToken);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-    }
-    
-    public override int SaveChanges()
-    {
-        var entries = ChangeTracker.Entries()
-            .Where(e => e is { Entity: IHasTimestamps, 
-                State: EntityState.Modified });
-
-        foreach (var entry in entries)
-        {
-            var entity = (IHasTimestamps)entry.Entity;
-            entity.Update();
-        }
-
-        return base.SaveChanges();
     }
     
     private ILoggerFactory CreateLoggerFactory()

@@ -10,7 +10,7 @@ public record Email
     public static Result<Email, Error> Create(string email)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return Errors.General.Validation(nameof(email));
+            return Errors.General.Validation(nameof(Email));
         return new Email(email);
     }
 }

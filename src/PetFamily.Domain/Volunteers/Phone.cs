@@ -10,7 +10,7 @@ public record Phone
     public static Result<Phone, Error> Create(string phone)
     {
         if (string.IsNullOrWhiteSpace(phone))
-            return Errors.General.Validation(nameof(phone));
+            return Errors.General.Validation(nameof(Phone));
         return new Phone(phone);
     }
 }

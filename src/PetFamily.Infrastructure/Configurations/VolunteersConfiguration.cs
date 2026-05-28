@@ -1,15 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Volunteers;
 
 namespace PetFamily.Infrastructure.Configurations;
 
-public class VolunteersConfiguration : IEntityTypeConfiguration<Volunteer>
+public class VolunteersConfiguration : AuditEntityConfiguration<Volunteer>
 {
-
-    public void Configure(EntityTypeBuilder<Volunteer> builder)
+    public override void Configure(EntityTypeBuilder<Volunteer> builder)
     {
+        base.Configure(builder);
+        
         builder.ToTable("Volunteers");
         
         builder.HasKey(x => x.Id);
@@ -50,17 +52,26 @@ public class VolunteersConfiguration : IEntityTypeConfiguration<Volunteer>
                 .IsRequired()
                 .HasMaxLength(Constants.MaxLengthLowValueText);
         });
+
+        builder.ComplexProperty(x => x.Description, propertyBuilder =>
+        {
+            propertyBuilder.IsRequired(false);
+            propertyBuilder.Property(p => p.Value)
+                .IsRequired()
+                .HasMaxLength(Constants.MaxLengthHighText);
+        });
         
-        builder.Property(x => x.Description)
-            .IsRequired(false)
-            .HasMaxLength(Constants.MaxLengthHighText);
-        
-        builder.Property(x => x.JobAge)
-            .IsRequired(false);
+        builder.ComplexProperty(x => x.JobAge, propertyBuilder =>
+        {
+            propertyBuilder.IsRequired(false);
+            propertyBuilder.Property(p => p.Value)
+                .IsRequired();
+        });
         
         builder.HasMany(x => x.Pets)
             .WithOne()
-            .HasForeignKey("volunteer_id");
+            .HasForeignKey("volunteer_id")
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.OwnsOne(x => x.VolunteerDetails, ownsBuilder =>
         {
@@ -87,5 +98,9 @@ public class VolunteersConfiguration : IEntityTypeConfiguration<Volunteer>
                     .HasMaxLength(Constants.MaxLengthMediumText);
             });
         });
+        
+        builder.Property<bool>("_isDeleted")
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasColumnName("is_deleted");
     }
 }

@@ -20,8 +20,10 @@ public enum HealthStatus
     UnderTreatment
 }
 
-public class Pet : AuditEntity<PetId>
+public class Pet : AuditEntity<PetId>, ISoftDelete
 {
+    private bool _isDeleted = false;
+    
     private Pet(PetId id, string name, SpeciesId speciesId, BreedId breedId) : base(id)
     {
         Name = name;
@@ -57,4 +59,7 @@ public class Pet : AuditEntity<PetId>
     
     public HealthStatus? HealthStatus { get; private set; }
     public HelpStatus? HelpStatus { get; private set; }
+    
+    public void Delete() => _isDeleted = true;
+    public void Restore() => _isDeleted = false;
 }

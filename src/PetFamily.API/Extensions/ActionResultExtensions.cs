@@ -19,8 +19,8 @@ public static class ActionResultExtensions
                 _ => StatusCodes.Status500InternalServerError
             }
         };
-
-    public static bool HasValidationResult(this ValidationResult result, out ActionResult actionResult)
+    
+    public static bool HasActionResult(this ValidationResult result, out ActionResult actionResult)
     {
         if (!result.IsValid)
         {

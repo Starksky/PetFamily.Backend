@@ -16,7 +16,21 @@ public class CustomResultFactory : IFluentValidationAutoValidationResultFactory
     {
         List<Error> errors = new List<Error>();
         foreach (var result in validationProblemDetails.Errors)
-            errors.AddRange(result.Value.Select(Error.Deserialize));
+            errors.AddRange(result.Value.Select(message =>
+            {
+                Error error;
+                
+                try
+                {
+                    error = Error.Deserialize(message);
+                }
+                catch (Exception e)
+                {
+                    error = Errors.General.Validation(result.Key, message);
+                }
+                
+                return error;
+            }));
         var envelope = Envelope.Error(errors);
         return new BadRequestObjectResult(envelope);
     }

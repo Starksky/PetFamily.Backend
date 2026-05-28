@@ -23,6 +23,40 @@ public class VolunteersRepository : IVolunteersRepository
 
         return volunteer.Id;
     }
+    
+    public async Task<UnitResult<Error>> AddPetsAsync(VolunteerId id, IEnumerable<Pet> pets, CancellationToken cancellationToken = default)
+    {
+        var volunteerResult = await GetByIdAsync(id, cancellationToken);
+        
+        if (volunteerResult.IsFailure)
+            return volunteerResult.Error;
+
+        var volunteer = volunteerResult.Value;
+        
+        var addResult = volunteer.AddPets(pets);
+        
+        if (addResult.IsFailure)
+            return addResult.Error;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Result.Success<Error>();
+    }
+    
+    public async Task<Guid> SaveAsync(Volunteer volunteer, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Volunteers.Attach(volunteer);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return volunteer.Id;
+    }
+    
+    public async Task<Guid> DeleteAsync(Volunteer volunteer, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Volunteers.Remove(volunteer);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        
+        return volunteer.Id;
+    }
 
     public async Task<Volunteer[]> GetAllAsync(CancellationToken cancellationToken = default)
     {

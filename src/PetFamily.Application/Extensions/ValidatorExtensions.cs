@@ -16,7 +16,16 @@ public static class ValidatorExtensions
             if (result.IsSuccess)
                 return;
 
-            context.AddFailure(result.Error.Serialize());
+            var key = context.DisplayName;
+            var error = result.Error;
+            
+            if (key?.ToLower() != error.PropertyName?.ToLower())
+                error = Error.Validation(error.Code, error.Message, $"{key}.{error.PropertyName}");
+            
+            context.AddFailure(error.Serialize());
         });
     }
+    
+    /*public static IRuleBuilderOptions<T, TElement> WithError<T, TElement>(this IRuleBuilderOptions<T, TElement> ruleBuilder, string fieldName = "field", string? errorMessage = null)
+        => ruleBuilder.WithMessage(Errors.General.Validation(fieldName, errorMessage).Serialize());*/
 }

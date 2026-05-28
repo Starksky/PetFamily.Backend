@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Volunteers.CreateVolunteer;
+using PetFamily.Application.Volunteers.Create;
+using PetFamily.Application.Volunteers.Delete;
+using PetFamily.Application.Volunteers.UpdateInfo;
 
 namespace PetFamily.Application;
 
@@ -10,6 +12,13 @@ public static class InjectExtension
     {
         services.AddScoped<CreateVolunteerHandler>();
         services.AddScoped<IValidator<CreateVolunteerRequest>, CreateVolunteerRequestValidator>();
+        
+        services.AddScoped<UpdateVolunteerInfoHandler>();
+        services.AddScoped<IValidator<UpdateVolunteerInfoDto>, UpdateVolunteerInfoDtoValidator>();
+        services.AddScoped<IValidator<UpdateVolunteerInfoRequest>, UpdateVolunteerInfoRequestValidator>();
+        
+        services.AddScoped<DeleteVolunteerHandler>();
+        services.AddScoped<IValidator<DeleteVolunteerRequest>, DeleteVolunteerRequestValidator>();
         return services;
     }
 }

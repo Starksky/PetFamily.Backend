@@ -104,5 +104,9 @@ public class PetConfiguration : AuditEntityConfiguration<Pet>
             .IsRequired(false)
             .HasConversion<string>()
             .HasMaxLength(Constants.MaxLengthLowValueText);
+        
+        builder.Property<bool>("_isDeleted")
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasColumnName("is_deleted");
     }
 }

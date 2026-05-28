@@ -1,20 +1,24 @@
 ﻿using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 using PetFamily.Application.Shared;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Volunteers;
 
-namespace PetFamily.Application.Volunteers.CreateVolunteer;
+namespace PetFamily.Application.Volunteers.Create;
 
 public class CreateVolunteerHandler : IExecuteTaskHandler<CreateVolunteerRequest, Result<Guid, Error>>
 {
     private readonly IVolunteersRepository _volunteersRepository;
-    
-    public CreateVolunteerHandler(IVolunteersRepository volunteersRepository)
+    private readonly ILogger<CreateVolunteerHandler> _logger;
+
+    public CreateVolunteerHandler(IVolunteersRepository volunteersRepository, 
+        ILogger<CreateVolunteerHandler> logger)
     {
+        _logger = logger;
         _volunteersRepository = volunteersRepository;
     }
     
-    public async Task<Result<Guid, Error>> ExecuteAsync(CreateVolunteerRequest createVolunteerRequest, CancellationToken cancellationToken = default)
+    public async Task<Result<Guid, Error>> HandleAsync(CreateVolunteerRequest createVolunteerRequest, CancellationToken cancellationToken = default)
     {
         var phone = Phone.Create(createVolunteerRequest.Phone).Value;
         var email = Email.Create(createVolunteerRequest.Email).Value;
@@ -28,12 +32,14 @@ public class CreateVolunteerHandler : IExecuteTaskHandler<CreateVolunteerRequest
         
         var volunteerId = VolunteerId.NewId();
         
-        var fio = Fio.Create(createVolunteerRequest.FirstName, 
-                                        createVolunteerRequest.LastName, 
-                                        createVolunteerRequest.Patronymic).Value;
+        var fio = Fio.Create(createVolunteerRequest.Fio.FirstName, 
+                                        createVolunteerRequest.Fio.LastName, 
+                                        createVolunteerRequest.Fio.Patronymic).Value;
 
         var volunteer = new Volunteer(volunteerId, fio, email, phone);
         var result = await _volunteersRepository.AddAsync(volunteer, cancellationToken);
+        
+        _logger.LogInformation("Created Volunteer {@id}", volunteer.Id.Value);
         
         return result;
     }
