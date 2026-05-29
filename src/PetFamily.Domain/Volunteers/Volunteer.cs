@@ -35,6 +35,7 @@ public sealed class Volunteer : AuditEntity<VolunteerId>, ISoftDelete
     public int GetCountNeedHomePets() => _pets.Count(p => p.HelpStatus == HelpStatus.NeedHome);
     public int GetCountNeedHelpPets() => _pets.Count(p => p.HelpStatus == HelpStatus.NeedHelp);
 
+    
     public void Delete() 
     {
         if (_isDeleted)

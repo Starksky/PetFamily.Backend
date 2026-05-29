@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace PetFamily.Domain.Shared;
 
@@ -18,10 +19,10 @@ public record Error
         PropertyName = propertyName;
     }
 
-    public string Serialize() => JsonConvert.SerializeObject(this);
+    public string Serialize() => JsonSerializer.Serialize(this);
     public static Error Deserialize(string json) 
     {
-         Error? error = JsonConvert.DeserializeObject<Error>(json);
+         Error? error = JsonSerializer.Deserialize<Error>(json);
          if (error == null)
              throw new InvalidOperationException();
          return error;
