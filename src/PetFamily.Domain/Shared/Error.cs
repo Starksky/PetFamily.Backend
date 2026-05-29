@@ -11,7 +11,7 @@ public record Error
     public EErrorType ErrorType { get; }
     
     [JsonConstructor]
-    private Error(string code, string message, EErrorType errorType, string? propertyName = null)
+    public Error(string code, string message, EErrorType errorType, string? propertyName = null)
     {
         Code = code;
         Message = message;
@@ -32,8 +32,8 @@ public record Error
         => new Error(code, message, EErrorType.Unknown);
     public static Error Validation(string code, string message, string? propertyName = null)
         => new Error(code, message, EErrorType.Validation, propertyName);
-    public static Error NotFound(string code, string message)
-        => new Error(code, message, EErrorType.NotFound);
+    public static Error NotFound(string code, string message, string? propertyName = null)
+        => new Error(code, message, EErrorType.NotFound, propertyName);
     public static Error Conflict(string code, string message)
         => new Error(code, message, EErrorType.Conflict);
     public static Error Failure(string code, string message)

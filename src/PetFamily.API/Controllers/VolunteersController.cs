@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.API.Extensions;
+using PetFamily.Application.Volunteers.AddPet;
 using PetFamily.Application.Volunteers.Create;
 using PetFamily.Application.Volunteers.Delete;
 using PetFamily.Application.Volunteers.UpdateInfo;
@@ -56,4 +57,25 @@ public class VolunteersController : ApplicationController
         var result = await handler.HandleAsync(request, cancellationToken);
         return result.ToOkResult();
     }
+    
+    [HttpPost("{id:guid}/pet")]
+    public async Task<IActionResult> AddPet([FromRoute] Guid id,
+        [FromBody] AddPetRequest request, 
+        [FromServices] AddPetHandler handler,
+        [FromServices] IValidator<AddPetDto> validator,
+        CancellationToken cancellationToken)
+    {
+        //using auto-validation
+        
+        var dto = new AddPetDto(id, request);
+        
+        //validation dto
+        var validationResult = await validator.ValidateAsync(dto, cancellationToken);
+        if (validationResult.HasActionResult(out var actionResult))
+            return actionResult;
+        
+        var result = await handler.HandleAsync(dto, cancellationToken);
+        return result.ToOkResult();
+    }
+    
 }

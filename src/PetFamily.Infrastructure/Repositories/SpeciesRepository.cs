@@ -29,9 +29,11 @@ public class SpeciesRepository : ISpeciesRepository
 
     public async Task<Result<Species, Error>> GetById(SpeciesId id, CancellationToken cancellationToken = default)
     {
-        var find = await _dbContext.Species.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+        var find = await _dbContext.Species
+            .Include(s => s.Breeds)
+            .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
         if (find == null)
-            return Errors.General.NotFound(id);
+            return Errors.General.NotFound(id, "Species");
         return find;
     }
 }

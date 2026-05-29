@@ -25,9 +25,12 @@ public class Species : Entity<SpeciesId>
     public IReadOnlyList<Breed> Breeds => _breeds;
 
     
-    public Result AddBreed(Breed breed)
+    public UnitResult<Error> AddBreed(Breed breed)
     {
         _breeds.Add(breed);
-        return Result.Success();
+        return Result.Success<Error>();
     }
+
+    public UnitResult<Error> HasBreed(BreedId breedId)
+        => _breeds.Any(b => b.Id == breedId) ? Result.Success<Error>() : Errors.General.NotFound(breedId.Value, "Breed");
 }

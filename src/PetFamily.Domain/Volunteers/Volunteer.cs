@@ -62,10 +62,9 @@ public sealed class Volunteer : AuditEntity<VolunteerId>, ISoftDelete
         JobAge = jobAge;
     }
     
-    public UnitResult<Error> AddPets(IEnumerable<Pet> pets)
+    public UnitResult<Error> AddPet(Pet pet)
     {
-        _pets.AddRange(pets);
-
+        _pets.Add(pet);
         return Result.Success<Error>();
     }
 }

@@ -24,16 +24,9 @@ public class VolunteersRepository : IVolunteersRepository
         return volunteer.Id;
     }
     
-    public async Task<UnitResult<Error>> AddPetsAsync(VolunteerId id, IEnumerable<Pet> pets, CancellationToken cancellationToken = default)
+    public async Task<UnitResult<Error>> AddPetAsync(Volunteer volunteer, Pet pet, CancellationToken cancellationToken = default)
     {
-        var volunteerResult = await GetByIdAsync(id, cancellationToken);
-        
-        if (volunteerResult.IsFailure)
-            return volunteerResult.Error;
-
-        var volunteer = volunteerResult.Value;
-        
-        var addResult = volunteer.AddPets(pets);
+        var addResult = volunteer.AddPet(pet);
         
         if (addResult.IsFailure)
             return addResult.Error;

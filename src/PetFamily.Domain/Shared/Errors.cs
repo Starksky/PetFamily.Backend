@@ -4,8 +4,8 @@ public static class Errors
 {
     public static class General
     {
-        public static Error NotFound(Guid? guid = null) 
-            => Error.NotFound("record.not.found", $"record{(guid != null ? $" with ID {guid}" : "")} not found.");
+        public static Error NotFound(Guid? guid = null, string nameRecord = "record", string? nameField = null) 
+            => Error.NotFound("record.not.found", $"{nameRecord}{(guid != null ? $" with ID {guid}" : "")} not found.", nameField);
         public static Error IsAlreadyExists(string nameRecord = "record") 
             => Error.Conflict("record.is.already.exists", $"{nameRecord} is already exists.");
         

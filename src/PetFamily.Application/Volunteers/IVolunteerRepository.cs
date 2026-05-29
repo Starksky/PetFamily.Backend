@@ -7,7 +7,7 @@ namespace PetFamily.Application.Volunteers;
 public interface IVolunteersRepository
 {
     public Task<Guid> AddAsync(Volunteer volunteer, CancellationToken cancellationToken = default);
-    public Task<UnitResult<Error>> AddPetsAsync(VolunteerId id, IEnumerable<Pet> pets,
+    public Task<UnitResult<Error>> AddPetAsync(Volunteer volunteer, Pet pet,
         CancellationToken cancellationToken = default);
     public Task<Guid> SaveAsync(Volunteer volunteer, CancellationToken cancellationToken = default);
     public Task<Guid> DeleteAsync(Volunteer volunteer, CancellationToken cancellationToken = default);
