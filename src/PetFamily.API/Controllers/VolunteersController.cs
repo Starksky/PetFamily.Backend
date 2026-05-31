@@ -5,77 +5,104 @@ using PetFamily.Application.Volunteers.AddPet;
 using PetFamily.Application.Volunteers.Create;
 using PetFamily.Application.Volunteers.Delete;
 using PetFamily.Application.Volunteers.UpdateInfo;
+using PetFamily.Application.Volunteers.UpdatePet;
 
 namespace PetFamily.API.Controllers;
 
 public class VolunteersController : ApplicationController
 {
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateVolunteerRequest request, 
+    public async Task<IActionResult> Create(
+        [FromBody] CreateVolunteerRequest request,
         [FromServices] CreateVolunteerHandler handler,
         CancellationToken cancellationToken)
     {
         //using auto-validation
-        
+
         var result = await handler.HandleAsync(request, cancellationToken);
         return result.ToOkResult();
     }
 
     [HttpPatch("{id:guid}/info")]
-    public async Task<IActionResult> UpdateInfo([FromRoute] Guid id, 
+    public async Task<IActionResult> UpdateInfo(
+        [FromRoute] Guid id,
         [FromServices] UpdateVolunteerInfoHandler handler,
         [FromBody] UpdateVolunteerInfoRequest request,
         [FromServices] IValidator<UpdateVolunteerInfoDto> validator,
         CancellationToken cancellationToken)
     {
         //using auto-validation request
-        
+
         var dto = new UpdateVolunteerInfoDto(id, request);
-        
+
         //validation dto
         var validationResult = await validator.ValidateAsync(dto, cancellationToken);
         if (validationResult.HasActionResult(out var actionResult))
             return actionResult;
-        
+
         var result = await handler.HandleAsync(dto, cancellationToken);
         return result.ToOkResult();
     }
-    
+
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete([FromRoute] Guid id, 
+    public async Task<IActionResult> Delete(
+        [FromRoute] Guid id,
         [FromServices] DeleteVolunteerHandler handler,
         [FromServices] IValidator<DeleteVolunteerRequest> validator,
         CancellationToken cancellationToken)
     {
         var request = new DeleteVolunteerRequest(id);
-        
+
         //validation request
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (validationResult.HasActionResult(out var actionResult))
             return actionResult;
-        
+
         var result = await handler.HandleAsync(request, cancellationToken);
         return result.ToOkResult();
     }
-    
+
     [HttpPost("{id:guid}/pet")]
-    public async Task<IActionResult> AddPet([FromRoute] Guid id,
-        [FromBody] AddPetRequest request, 
+    public async Task<IActionResult> AddPet(
+        [FromRoute] Guid id,
+        [FromBody] AddPetRequest request,
         [FromServices] AddPetHandler handler,
         [FromServices] IValidator<AddPetDto> validator,
         CancellationToken cancellationToken)
     {
         //using auto-validation
-        
+
         var dto = new AddPetDto(id, request);
-        
+
         //validation dto
         var validationResult = await validator.ValidateAsync(dto, cancellationToken);
         if (validationResult.HasActionResult(out var actionResult))
             return actionResult;
-        
+
         var result = await handler.HandleAsync(dto, cancellationToken);
         return result.ToOkResult();
     }
-    
+
+    [HttpPut("{id:guid}/pet/{idPet:guid}")]
+    public async Task<IActionResult> UpdatePet(
+        [FromRoute] Guid id,
+        [FromRoute] Guid idPet,
+        [FromBody] UpdatePetRequest request,
+        [FromServices] UpdatePetHandler handler,
+        [FromServices] IValidator<UpdatePetDto> validator,
+        CancellationToken cancellationToken)
+    {
+        //using auto-validation
+
+        var dto = new UpdatePetDto(id, idPet, request);
+
+        //validation dto
+        var validationResult = await validator.ValidateAsync(dto, cancellationToken);
+        if (validationResult.HasActionResult(out var actionResult))
+            return actionResult;
+
+        var result = await handler.HandleAsync(dto, cancellationToken);
+        return result.ToOkResult();
+    }
+
 }

@@ -20,7 +20,7 @@ public class PetConfiguration : AuditEntityConfiguration<Pet>
             .IsRequired()
             .HasConversion(id => id.Value,
                 value => PetId.Create(value));
-
+        
         builder.Property(p => p.SpeciesId)
             .IsRequired()
             .HasConversion(
@@ -33,7 +33,19 @@ public class PetConfiguration : AuditEntityConfiguration<Pet>
                 id => id.Value,
                 value => BreedId.Create(value));
         
-        builder.OwnsOne(x => x.PetDetails, ownsBuilder =>
+        builder.OwnsOne(x => x.PhotosContainer, ownsBuilder =>
+        {
+            ownsBuilder.ToJson();
+            
+            ownsBuilder.OwnsMany(x => x.Photos, photoBuilder =>
+            {
+                photoBuilder.Property(p => p.PathToStorage)
+                    .IsRequired()
+                    .HasMaxLength(Constants.MaxLengthLowText);
+            });
+        });
+        
+        builder.OwnsOne(x => x.RequisitesContainer, ownsBuilder =>
         {
             ownsBuilder.ToJson();
 
@@ -47,18 +59,15 @@ public class PetConfiguration : AuditEntityConfiguration<Pet>
                     .IsRequired()
                     .HasMaxLength(Constants.MaxLengthMediumText);
             });
-
-            ownsBuilder.OwnsMany(x => x.Photos, photoBuilder =>
-            {
-                photoBuilder.Property(p => p.PathToStorage)
-                    .IsRequired()
-                    .HasMaxLength(Constants.MaxLengthLowText);
-            });
         });
         
-        builder.Property(p => p.Description)
-            .IsRequired(false)
-            .HasMaxLength(Constants.MaxLengthHighText);
+        builder.ComplexProperty(x => x.Description, propertyBuilder =>
+        {
+            propertyBuilder.IsRequired(false);
+            propertyBuilder.Property(p => p.Value)
+                .IsRequired()
+                .HasMaxLength(Constants.MaxLengthHighText);
+        });
         
         builder.Property(p => p.Color)
             .IsRequired(false)
@@ -108,5 +117,9 @@ public class PetConfiguration : AuditEntityConfiguration<Pet>
         builder.Property<bool>("_isDeleted")
             .UsePropertyAccessMode(PropertyAccessMode.Field)
             .HasColumnName("is_deleted");
+        
+        builder.Property<bool>("_isPublished")
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasColumnName("is_published");
     }
 }

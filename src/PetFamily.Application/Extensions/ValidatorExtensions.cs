@@ -6,12 +6,15 @@ namespace PetFamily.Application.Extensions;
 
 public static class ValidatorExtensions
 {
-    public static IRuleBuilderOptionsConditions<T, TElement> MustBeValueObject<T, TElement, TValueObject>(
-        this IRuleBuilder<T, TElement> ruleBuilder,
+    public static IRuleBuilderOptionsConditions<T, TElement?> MustBeValueObject<T, TElement, TValueObject>(
+        this IRuleBuilder<T, TElement?> ruleBuilder,
         Func<TElement, Result<TValueObject, Error>> factoryMethod)
     {
         return ruleBuilder.Custom((element, context) =>
         {
+            if (element == null)
+                return;
+            
             Result<TValueObject, Error> result = factoryMethod(element);
             if (result.IsSuccess)
                 return;

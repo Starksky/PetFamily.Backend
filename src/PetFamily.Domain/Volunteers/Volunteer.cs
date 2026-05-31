@@ -67,4 +67,12 @@ public sealed class Volunteer : AuditEntity<VolunteerId>, ISoftDelete
         _pets.Add(pet);
         return Result.Success<Error>();
     }
+
+    public Result<Pet, Error> GetPet(PetId id)
+    {
+        var find = _pets.FirstOrDefault(p => p.Id == id);
+        if (find == null)
+            return Errors.General.NotFound(id);
+        return find;
+    }
 }

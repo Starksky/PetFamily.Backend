@@ -9,7 +9,7 @@ public class UpdateVolunteerInfoDtoValidator : AbstractValidator<UpdateVolunteer
 {
     public UpdateVolunteerInfoDtoValidator()
     {
-        RuleFor(d => d.Id).NotEmpty();
+        RuleFor(d => d.VolunteerId).NotEmpty();
     }
 }
 

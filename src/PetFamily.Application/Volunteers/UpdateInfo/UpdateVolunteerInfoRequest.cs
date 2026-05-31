@@ -2,4 +2,4 @@
 
 
 public record UpdateVolunteerInfoRequest(string Description, int JobAge);
-public record UpdateVolunteerInfoDto(Guid Id, UpdateVolunteerInfoRequest Request);
+public record UpdateVolunteerInfoDto(Guid VolunteerId, UpdateVolunteerInfoRequest Request);
