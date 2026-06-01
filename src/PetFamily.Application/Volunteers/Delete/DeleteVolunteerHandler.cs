@@ -1,5 +1,4 @@
 ﻿using CSharpFunctionalExtensions;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 using PetFamily.Domain.Shared;
 
@@ -29,13 +28,3 @@ public class DeleteVolunteerHandler
         return request.Id;
     }
 }
-
-public record DeleteVolunteerRequest(Guid Id);
-
-public class DeleteVolunteerRequestValidator : AbstractValidator<DeleteVolunteerRequest>
-{
-    public DeleteVolunteerRequestValidator()
-    {
-        RuleFor(x => x.Id).NotNull();
-    }
-} 
