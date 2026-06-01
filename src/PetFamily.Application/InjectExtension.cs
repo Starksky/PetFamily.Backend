@@ -27,7 +27,7 @@ public static class InjectExtension
         services.AddScoped<IValidator<AddPetRequest>, AddPetRequestValidator>();
         
         services.AddScoped<UpdatePetHandler>();
-        services.AddScoped<IValidator<UpdatePetCommand>, UpdatePetDtoValidator>();
+        services.AddScoped<IValidator<UpdatePetCommand>, UpdatePetCommandValidator>();
         services.AddScoped<IValidator<UpdatePetRequest>, UpdatePetRequestValidator>();
         return services;
     }
