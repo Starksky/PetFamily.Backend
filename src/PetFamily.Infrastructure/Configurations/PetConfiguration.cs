@@ -33,7 +33,14 @@ public class PetConfiguration : AuditEntityConfiguration<Pet>
                 id => id.Value,
                 value => BreedId.Create(value));
         
-        builder.OwnsOne(x => x.PhotosContainer, ownsBuilder =>
+        
+        builder.Property(p => p.PhotosContainer)
+            .IsRequired(false)
+            .HasConversion(
+                p => p == null ? string.Empty : p.Serialize(),
+                value => PhotosContainer.Deserialize(value));
+        
+        /*builder.OwnsOne(x => x.PhotosContainer, ownsBuilder =>
         {
             ownsBuilder.ToJson();
             
@@ -43,7 +50,7 @@ public class PetConfiguration : AuditEntityConfiguration<Pet>
                     .IsRequired()
                     .HasMaxLength(Constants.MaxLengthLowText);
             });
-        });
+        });*/
         
         builder.OwnsOne(x => x.RequisitesContainer, ownsBuilder =>
         {

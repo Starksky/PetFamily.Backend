@@ -5,6 +5,7 @@ using PetFamily.Application.Volunteers.Create;
 using PetFamily.Application.Volunteers.Delete;
 using PetFamily.Application.Volunteers.UpdateInfo;
 using PetFamily.Application.Volunteers.UpdatePet;
+using PetFamily.Application.Volunteers.UploadPetPhotos;
 
 namespace PetFamily.Application;
 
@@ -29,6 +30,9 @@ public static class InjectExtension
         services.AddScoped<UpdatePetHandler>();
         services.AddScoped<IValidator<UpdatePetCommand>, UpdatePetCommandValidator>();
         services.AddScoped<IValidator<UpdatePetRequest>, UpdatePetRequestValidator>();
+        
+        services.AddScoped<UploadPetPhotosHandler>();
+        services.AddScoped<IValidator<UploadPetPhotosCommand>, UploadPetPhotosCommandValidator>();
         return services;
     }
 }

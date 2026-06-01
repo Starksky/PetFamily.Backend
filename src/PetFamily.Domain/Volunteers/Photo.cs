@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Text.Json.Serialization;
+using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteers;
@@ -6,6 +7,7 @@ namespace PetFamily.Domain.Volunteers;
 public record Photo
 {
 
+    [JsonConstructor]
     private Photo(string pathToStorage )
     {
         PathToStorage = pathToStorage ;

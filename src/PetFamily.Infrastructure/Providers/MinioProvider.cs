@@ -1,6 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
 using PetFamily.Application.Providers;
@@ -15,14 +15,14 @@ public class MinioProvider : IFileProvider
     private readonly ILogger<MinioProvider> _logger;
     private readonly SemaphoreSlim _semaphore;
     
-    public MinioProvider(IMinioClient minioClient, ILogger<MinioProvider> logger, MinioOptions minioOptions)
+    public MinioProvider(IMinioClient minioClient, ILogger<MinioProvider> logger, IOptions<MinioOptions> minioOptions)
     {
         _minioClient = minioClient;
         _logger = logger;
-        _semaphore = new SemaphoreSlim(minioOptions.MaxConcurrentUploads);
+        _semaphore = new SemaphoreSlim(minioOptions.Value.MaxConcurrentUploads);
     }
     
-    public async Task<Result<string, Error>> UploadFileAsync(FileUploadArgs uploadArgs, CancellationToken cancellationToken)
+    public async Task<Result<FileUploadResult, Error>> UploadFileAsync(FileUploadArgs uploadArgs, CancellationToken cancellationToken)
     {
         await _semaphore.WaitAsync(cancellationToken);
         
@@ -43,10 +43,10 @@ public class MinioProvider : IFileProvider
                 .WithBucket(uploadArgs.BucketName)
                 .WithStreamData(uploadArgs.Stream)
                 .WithObjectSize(uploadArgs.Stream.Length)
-                .WithObject(uploadArgs.FileName);
+                .WithObject(uploadArgs.InternalName);
             
             var result = await _minioClient.PutObjectAsync(putObjectArgs, cancellationToken);
-            return result.ObjectName;
+            return new FileUploadResult(uploadArgs.FileName, result.ObjectName);
         }
         catch (Exception e)
         {
@@ -59,7 +59,7 @@ public class MinioProvider : IFileProvider
         }
     }
     
-    public async Task<(IEnumerable<string>, IEnumerable<Error>)> UploadFilesAsync(IEnumerable<FileUploadArgs> uploadsArgs, CancellationToken cancellationToken)
+    public async Task<(IEnumerable<FileUploadResult>, IEnumerable<Error>)> UploadFilesAsync(IEnumerable<FileUploadArgs> uploadsArgs, CancellationToken cancellationToken)
     {
         var tasks = uploadsArgs.Select(args => UploadFileAsync(args, cancellationToken));
         

@@ -88,4 +88,11 @@ public class Pet : AuditEntity<PetId>, ISoftDelete
         HealthStatus = data.HealthStatus;
         HelpStatus = data.HelpStatus;
     }
+    
+    public void AddPhotos(IEnumerable<Photo> photos)
+    {
+        var addedPhotos = PhotosContainer?.Photos.ToList() ?? [];
+        addedPhotos.AddRange(photos);
+        PhotosContainer = new PhotosContainer(addedPhotos);
+    }
 }

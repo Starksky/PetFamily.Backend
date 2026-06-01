@@ -1,11 +1,14 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using PetFamily.API.Common;
 using PetFamily.API.Extensions;
+using PetFamily.API.Requests;
 using PetFamily.Application.Volunteers.AddPet;
 using PetFamily.Application.Volunteers.Create;
 using PetFamily.Application.Volunteers.Delete;
 using PetFamily.Application.Volunteers.UpdateInfo;
 using PetFamily.Application.Volunteers.UpdatePet;
+using PetFamily.Application.Volunteers.UploadPetPhotos;
 
 namespace PetFamily.API.Controllers;
 
@@ -105,18 +108,19 @@ public class VolunteersController : ApplicationController
         return result.ToOkResult();
     }
     
-    /*[HttpPatch("{id:guid}/pet/{idPet:guid}/photos")]
+    [HttpPatch("{id:guid}/pet/{idPet:guid}/photos")]
     public async Task<IActionResult> UpdatePetPhotos(
         [FromRoute] Guid id,
         [FromRoute] Guid idPet,
-        [FromForm] UpdatePetRequest request,
-        [FromServices] UpdatePetHandler handler,
-        [FromServices] IValidator<UpdatePetCommand> validator,
+        [FromForm] UploadPetPhotosForm request,
+        [FromServices] UploadPetPhotosHandler handler,
+        [FromServices] IValidator<UploadPetPhotosCommand> validator,
         CancellationToken cancellationToken)
     {
-        //using auto-validation
+        await using var processFiles = new FormFileProcessor();
 
-        var command = new UpdatePetCommand(id, idPet, request);
+        var photoArgs = processFiles.Process("photos", request.Files);
+        var command = new UploadPetPhotosCommand(id, idPet, photoArgs);
 
         //validation command
         var validationResult = await validator.ValidateAsync(command, cancellationToken);
@@ -125,5 +129,5 @@ public class VolunteersController : ApplicationController
 
         var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToOkResult();
-    }*/
+    }
 }
