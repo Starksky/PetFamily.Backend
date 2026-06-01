@@ -25,27 +25,27 @@ public class AddPetHandler
         _logger = logger;
     }
 
-    public async Task<Result<Guid, Error>> HandleAsync(AddPetDto dto, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Error>> HandleAsync(AddPetCommand command, CancellationToken cancellationToken)
     {
-        var volunteerResult = await _volunteerRepository.GetByIdAsync(dto.VolunteerId, cancellationToken);
+        var volunteerResult = await _volunteerRepository.GetByIdAsync(command.VolunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
             return volunteerResult.Error;
 
         var volunteer = volunteerResult.Value;
 
-        var speciesId = SpeciesId.Create(Guid.Parse(dto.Request.SpeciesId));
+        var speciesId = SpeciesId.Create(Guid.Parse(command.Request.SpeciesId));
         var speciesResult = await _speciesRepository.GetById(speciesId, cancellationToken);
         if (speciesResult.IsFailure)
-            return speciesResult.Error.WithPropertyName(nameof(dto.Request.SpeciesId));
+            return speciesResult.Error.WithPropertyName(nameof(command.Request.SpeciesId));
 
         var species = speciesResult.Value;
-        var breedId = BreedId.Create(Guid.Parse(dto.Request.BreedId));
+        var breedId = BreedId.Create(Guid.Parse(command.Request.BreedId));
         var resultHasBreed = species.HasBreed(breedId);
         if (resultHasBreed.IsFailure)
-            return resultHasBreed.Error.WithPropertyName(nameof(dto.Request.BreedId));
+            return resultHasBreed.Error.WithPropertyName(nameof(command.Request.BreedId));
 
         var petId = PetId.NewId();
-        var petResult = Pet.Create(petId, dto.Request.Name, speciesId, breedId);
+        var petResult = Pet.Create(petId, command.Request.Name, speciesId, breedId);
         if (petResult.IsFailure)
             return petResult.Error;
 

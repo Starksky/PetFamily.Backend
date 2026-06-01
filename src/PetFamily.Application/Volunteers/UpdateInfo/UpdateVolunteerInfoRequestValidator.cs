@@ -5,7 +5,7 @@ using PetFamily.Domain.Volunteers;
 namespace PetFamily.Application.Volunteers.UpdateInfo;
 
 
-public class UpdateVolunteerInfoDtoValidator : AbstractValidator<UpdateVolunteerInfoDto>
+public class UpdateVolunteerInfoDtoValidator : AbstractValidator<UpdateVolunteerInfoCommand>
 {
     public UpdateVolunteerInfoDtoValidator()
     {

@@ -9,4 +9,5 @@ public class MinioOptions
     public string SecretKey { get; init; } = string.Empty;
     
     public bool WithSsl { get; init; } = false;
+    public int MaxConcurrentUploads { get; init; } = 5;
 }

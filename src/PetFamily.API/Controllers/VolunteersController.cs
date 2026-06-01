@@ -28,19 +28,19 @@ public class VolunteersController : ApplicationController
         [FromRoute] Guid id,
         [FromServices] UpdateVolunteerInfoHandler handler,
         [FromBody] UpdateVolunteerInfoRequest request,
-        [FromServices] IValidator<UpdateVolunteerInfoDto> validator,
+        [FromServices] IValidator<UpdateVolunteerInfoCommand> validator,
         CancellationToken cancellationToken)
     {
         //using auto-validation request
 
-        var dto = new UpdateVolunteerInfoDto(id, request);
+        var command = new UpdateVolunteerInfoCommand(id, request);
 
-        //validation dto
-        var validationResult = await validator.ValidateAsync(dto, cancellationToken);
+        //validation command
+        var validationResult = await validator.ValidateAsync(command, cancellationToken);
         if (validationResult.HasActionResult(out var actionResult))
             return actionResult;
 
-        var result = await handler.HandleAsync(dto, cancellationToken);
+        var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToOkResult();
     }
 
@@ -67,19 +67,19 @@ public class VolunteersController : ApplicationController
         [FromRoute] Guid id,
         [FromBody] AddPetRequest request,
         [FromServices] AddPetHandler handler,
-        [FromServices] IValidator<AddPetDto> validator,
+        [FromServices] IValidator<AddPetCommand> validator,
         CancellationToken cancellationToken)
     {
         //using auto-validation
 
-        var dto = new AddPetDto(id, request);
+        var command = new AddPetCommand(id, request);
 
-        //validation dto
-        var validationResult = await validator.ValidateAsync(dto, cancellationToken);
+        //validation command
+        var validationResult = await validator.ValidateAsync(command, cancellationToken);
         if (validationResult.HasActionResult(out var actionResult))
             return actionResult;
 
-        var result = await handler.HandleAsync(dto, cancellationToken);
+        var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToOkResult();
     }
 
@@ -89,20 +89,41 @@ public class VolunteersController : ApplicationController
         [FromRoute] Guid idPet,
         [FromBody] UpdatePetRequest request,
         [FromServices] UpdatePetHandler handler,
-        [FromServices] IValidator<UpdatePetDto> validator,
+        [FromServices] IValidator<UpdatePetCommand> validator,
         CancellationToken cancellationToken)
     {
         //using auto-validation
 
-        var dto = new UpdatePetDto(id, idPet, request);
+        var command = new UpdatePetCommand(id, idPet, request);
 
-        //validation dto
-        var validationResult = await validator.ValidateAsync(dto, cancellationToken);
+        //validation command
+        var validationResult = await validator.ValidateAsync(command, cancellationToken);
         if (validationResult.HasActionResult(out var actionResult))
             return actionResult;
 
-        var result = await handler.HandleAsync(dto, cancellationToken);
+        var result = await handler.HandleAsync(command, cancellationToken);
         return result.ToOkResult();
     }
+    
+    /*[HttpPatch("{id:guid}/pet/{idPet:guid}/photos")]
+    public async Task<IActionResult> UpdatePetPhotos(
+        [FromRoute] Guid id,
+        [FromRoute] Guid idPet,
+        [FromForm] UpdatePetRequest request,
+        [FromServices] UpdatePetHandler handler,
+        [FromServices] IValidator<UpdatePetCommand> validator,
+        CancellationToken cancellationToken)
+    {
+        //using auto-validation
 
+        var command = new UpdatePetCommand(id, idPet, request);
+
+        //validation command
+        var validationResult = await validator.ValidateAsync(command, cancellationToken);
+        if (validationResult.HasActionResult(out var actionResult))
+            return actionResult;
+
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.ToOkResult();
+    }*/
 }

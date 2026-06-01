@@ -16,18 +16,18 @@ public static class InjectExtension
         services.AddScoped<IValidator<CreateVolunteerRequest>, CreateVolunteerRequestValidator>();
         
         services.AddScoped<UpdateVolunteerInfoHandler>();
-        services.AddScoped<IValidator<UpdateVolunteerInfoDto>, UpdateVolunteerInfoDtoValidator>();
+        services.AddScoped<IValidator<UpdateVolunteerInfoCommand>, UpdateVolunteerInfoDtoValidator>();
         services.AddScoped<IValidator<UpdateVolunteerInfoRequest>, UpdateVolunteerInfoRequestValidator>();
         
         services.AddScoped<DeleteVolunteerHandler>();
         services.AddScoped<IValidator<DeleteVolunteerRequest>, DeleteVolunteerRequestValidator>();
         
         services.AddScoped<AddPetHandler>();
-        services.AddScoped<IValidator<AddPetDto>, AddPetDtoValidator>();
+        services.AddScoped<IValidator<AddPetCommand>, AddPetDtoValidator>();
         services.AddScoped<IValidator<AddPetRequest>, AddPetRequestValidator>();
         
         services.AddScoped<UpdatePetHandler>();
-        services.AddScoped<IValidator<UpdatePetDto>, UpdatePetDtoValidator>();
+        services.AddScoped<IValidator<UpdatePetCommand>, UpdatePetDtoValidator>();
         services.AddScoped<IValidator<UpdatePetRequest>, UpdatePetRequestValidator>();
         return services;
     }

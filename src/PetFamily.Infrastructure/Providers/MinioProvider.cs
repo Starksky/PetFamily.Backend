@@ -1,9 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Minio;
 using Minio.DataModel.Args;
 using PetFamily.Application.Providers;
 using PetFamily.Domain.Shared;
+using PetFamily.Infrastructure.Options;
 
 namespace PetFamily.Infrastructure.Providers;
 
@@ -11,15 +13,19 @@ public class MinioProvider : IFileProvider
 {
     private readonly IMinioClient _minioClient;
     private readonly ILogger<MinioProvider> _logger;
-
-    public MinioProvider(IMinioClient minioClient, ILogger<MinioProvider> logger)
+    private readonly SemaphoreSlim _semaphore;
+    
+    public MinioProvider(IMinioClient minioClient, ILogger<MinioProvider> logger, MinioOptions minioOptions)
     {
         _minioClient = minioClient;
         _logger = logger;
+        _semaphore = new SemaphoreSlim(minioOptions.MaxConcurrentUploads);
     }
     
     public async Task<Result<string, Error>> UploadFileAsync(FileUploadArgs uploadArgs, CancellationToken cancellationToken)
     {
+        await _semaphore.WaitAsync(cancellationToken);
+        
         try
         {
             var bucketExistArgs = new BucketExistsArgs()
@@ -40,7 +46,6 @@ public class MinioProvider : IFileProvider
                 .WithObject(uploadArgs.FileName);
             
             var result = await _minioClient.PutObjectAsync(putObjectArgs, cancellationToken);
-            
             return result.ObjectName;
         }
         catch (Exception e)
@@ -48,5 +53,26 @@ public class MinioProvider : IFileProvider
             _logger.LogError(e, "Error uploading file");
             return Error.Failure("upload.file.error", "Error uploading file");
         }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+    
+    public async Task<(IEnumerable<string>, IEnumerable<Error>)> UploadFilesAsync(IEnumerable<FileUploadArgs> uploadsArgs, CancellationToken cancellationToken)
+    {
+        var tasks = uploadsArgs.Select(args => UploadFileAsync(args, cancellationToken));
+        
+        var results = await Task.WhenAll(tasks);
+        
+        var errors = results
+            .Where(r => r.IsFailure)
+            .Select(r => r.Error);
+        
+        var fileNames = results
+            .Where(r => r.IsSuccess)
+            .Select(r => r.Value);
+        
+        return (fileNames, errors);
     }
 }

@@ -3,7 +3,7 @@
 namespace PetFamily.Application.Volunteers.AddPet;
 
 
-public class AddPetDtoValidator : AbstractValidator<AddPetDto>
+public class AddPetDtoValidator : AbstractValidator<AddPetCommand>
 {
     public AddPetDtoValidator()
     {

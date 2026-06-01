@@ -27,15 +27,15 @@ public class UpdatePetHandler
         _logger = logger;
     }
 
-    public async Task<Result<Guid, Error>> HandleAsync(UpdatePetDto dto, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Error>> HandleAsync(UpdatePetCommand command, CancellationToken cancellationToken)
     {
-        var volunteerResult = await _volunteersRepository.GetByIdAsync(dto.VolunteerId, cancellationToken);
+        var volunteerResult = await _volunteersRepository.GetByIdAsync(command.VolunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
             return volunteerResult.Error;
         
         var volunteer = volunteerResult.Value;
         
-        var petId = PetId.Create(dto.PetId);
+        var petId = PetId.Create(command.PetId);
         var petResult = volunteer.GetPet(petId);
         if (petResult.IsFailure)
             return petResult.Error;
@@ -44,36 +44,36 @@ public class UpdatePetHandler
 
         SpeciesId? speciesId = null;
         Domain.Species.Species? species = null;
-        if (dto.Request.SpeciesId != null)
+        if (command.Request.SpeciesId != null)
         {
-            speciesId = SpeciesId.Create(Guid.Parse(dto.Request.SpeciesId));
+            speciesId = SpeciesId.Create(Guid.Parse(command.Request.SpeciesId));
             var speciesResult = await _speciesRepository.GetById(speciesId, cancellationToken);
             if (speciesResult.IsFailure)
-                return speciesResult.Error.WithPropertyName(nameof(dto.Request.SpeciesId));
+                return speciesResult.Error.WithPropertyName(nameof(command.Request.SpeciesId));
             
             species = speciesResult.Value;
         }
         
         
         BreedId? breedId = null;
-        if (dto.Request.BreedId != null)
+        if (command.Request.BreedId != null)
         {
             if (species == null)
                 species = (await _speciesRepository.GetById(pet.SpeciesId, cancellationToken)).Value;
             
-            breedId = BreedId.Create(Guid.Parse(dto.Request.BreedId));
+            breedId = BreedId.Create(Guid.Parse(command.Request.BreedId));
             var resultHasBreed = species.HasBreed(breedId);
             if (resultHasBreed.IsFailure)
-                return resultHasBreed.Error.WithPropertyName(nameof(dto.Request.BreedId));
+                return resultHasBreed.Error.WithPropertyName(nameof(command.Request.BreedId));
         } 
-        else if (dto.Request.SpeciesId != null)
-            return Errors.General.NotFound(null, nameof(dto.Request.BreedId));
+        else if (command.Request.SpeciesId != null)
+            return Errors.General.NotFound(null, nameof(command.Request.BreedId));
         
 
         Address? address = null;
-        if (dto.Request.Address != null)
+        if (command.Request.Address != null)
         {
-            var dtoAddress = dto.Request.Address;
+            var dtoAddress = command.Request.Address;
             var addressResult = Address.Create(
                 dtoAddress.PostalCode, 
                 dtoAddress.City, 
@@ -83,51 +83,51 @@ public class UpdatePetHandler
                 dtoAddress.ApartmentNumber);
             
             if (addressResult.IsFailure)
-                return addressResult.Error.WithPropertyName(nameof(dto.Request.Address));
+                return addressResult.Error.WithPropertyName(nameof(command.Request.Address));
             
             address = addressResult.Value;
         }
         
         Description? description = null;
-        if (!string.IsNullOrWhiteSpace(dto.Request.Description))
+        if (!string.IsNullOrWhiteSpace(command.Request.Description))
         {
-            var descriptionResult = Description.Create(dto.Request.Description);
+            var descriptionResult = Description.Create(command.Request.Description);
             if (descriptionResult.IsFailure)
-                return descriptionResult.Error.WithPropertyName(nameof(dto.Request.Description));
+                return descriptionResult.Error.WithPropertyName(nameof(command.Request.Description));
             
             description = descriptionResult.Value;
         }
         
         HealthStatus? healthStatus = null;
-        if (!string.IsNullOrWhiteSpace(dto.Request.HealthStatus))
+        if (!string.IsNullOrWhiteSpace(command.Request.HealthStatus))
         {
-            if (!Enum.TryParse<HealthStatus>(dto.Request.HealthStatus, true, out var status))
-                return Errors.General.Validation(nameof(dto.Request.HealthStatus));
+            if (!Enum.TryParse<HealthStatus>(command.Request.HealthStatus, true, out var status))
+                return Errors.General.Validation(nameof(command.Request.HealthStatus));
             
             healthStatus = status;
         }
         
         HelpStatus? helpStatus = null;
-        if (!string.IsNullOrWhiteSpace(dto.Request.HelpStatus))
+        if (!string.IsNullOrWhiteSpace(command.Request.HelpStatus))
         {
-            if (!Enum.TryParse<HelpStatus>(dto.Request.HelpStatus, true, out var status))
-                return Errors.General.Validation(nameof(dto.Request.HelpStatus));
+            if (!Enum.TryParse<HelpStatus>(command.Request.HelpStatus, true, out var status))
+                return Errors.General.Validation(nameof(command.Request.HelpStatus));
             
             helpStatus = status;
         }
         
         var petUpdateData = new UpdatePetData(
-            dto.Request.Name,
+            command.Request.Name,
             speciesId,
             breedId,
             address,
             description,
-            dto.Request.Color,
-            dto.Request.ContactPhone,
-            dto.Request.Height,
-            dto.Request.Width,
-            dto.Request.IsVaccinated,
-            dto.Request.IsNeutered,
+            command.Request.Color,
+            command.Request.ContactPhone,
+            command.Request.Height,
+            command.Request.Width,
+            command.Request.IsVaccinated,
+            command.Request.IsNeutered,
             healthStatus,
             helpStatus);
         
@@ -137,11 +137,11 @@ public class UpdatePetHandler
         
         _logger.LogInformation("Volunteer with id {id} updated a pet with id {petId}", volunteer.Id.Value, petId.Value);
         
-        return dto.PetId;
+        return command.PetId;
     }
 }
 
-public record UpdatePetDto(Guid VolunteerId, Guid PetId, UpdatePetRequest Request);
+public record UpdatePetCommand(Guid VolunteerId, Guid PetId, UpdatePetRequest Request);
 public record UpdatePetRequest(
     string? Name, 
     string? SpeciesId, 
@@ -164,9 +164,6 @@ public record AddressDto(
     int BuildingNumber,
     int? BuildingNumberTwo,
     int? ApartmentNumber);
-
-/*public record PhotoDto(Stream stream);
-public record PhotosContainerDto(IEnumerable<PhotoDto> Photos);*/
 
 public class UpdatePetRequestValidator : AbstractValidator<UpdatePetRequest>
 {
@@ -225,7 +222,7 @@ public class UpdatePetRequestValidator : AbstractValidator<UpdatePetRequest>
     }
 }
 
-public class UpdatePetDtoValidator : AbstractValidator<UpdatePetDto>
+public class UpdatePetDtoValidator : AbstractValidator<UpdatePetCommand>
 {
     public UpdatePetDtoValidator()
     {

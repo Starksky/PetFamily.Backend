@@ -17,22 +17,22 @@ public class UpdateVolunteerInfoHandler
         _volunteersRepository = volunteersRepository;
     }
     
-    public async Task<Result<Guid, Error>> HandleAsync(UpdateVolunteerInfoDto dto, 
+    public async Task<Result<Guid, Error>> HandleAsync(UpdateVolunteerInfoCommand command, 
         CancellationToken cancellationToken)
     {
-        var volunteerResult = await _volunteersRepository.GetByIdAsync(dto.VolunteerId, cancellationToken);
+        var volunteerResult = await _volunteersRepository.GetByIdAsync(command.VolunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
             return volunteerResult.Error;
         
         var volunteer = volunteerResult.Value;
-        var description = Description.Create(dto.Request.Description).Value;
-        var jobAge = JobAge.Create(dto.Request.JobAge).Value;
+        var description = Description.Create(command.Request.Description).Value;
+        var jobAge = JobAge.Create(command.Request.JobAge).Value;
         
         volunteer.UpdateInfo(description, jobAge);
         
         await _volunteersRepository.SaveAsync(volunteer, cancellationToken);
         
-        _logger.LogInformation("Volunteer with id {request.VolunteerId} has been updated.",  dto.VolunteerId);
+        _logger.LogInformation("Volunteer with id {request.VolunteerId} has been updated.",  command.VolunteerId);
 
         return volunteer.Id.Value;
     }
