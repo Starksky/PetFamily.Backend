@@ -62,7 +62,7 @@ public class UploadPetPhotosHandler
         
         await _volunteersRepository.SaveAsync(volunteer, cancellationToken);
         
-        _logger.LogInformation("Volunteer with id {Id} uploaded photos to pet with id {PetId}",  volunteer.Id, petId);
+        _logger.LogInformation("Volunteer with id {Id} uploaded photos to pet with id {PetId}",  volunteer.Id.Value, petId.Value);
         
         return new UploadPetPhotosResponse(photosResult, errorsResult);
     }

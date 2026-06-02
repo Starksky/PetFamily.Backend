@@ -32,31 +32,37 @@ public class PetConfiguration : AuditEntityConfiguration<Pet>
             .HasConversion(
                 id => id.Value,
                 value => BreedId.Create(value));
-        
-        
-        builder.Property(p => p.PhotosContainer)
+
+
+        builder.Property(p => p.Photos)
             .IsRequired(false)
             .HasConversion(
                 p => p == null ? string.Empty : p.Serialize(),
-                value => PhotosContainer.Deserialize(value));
+                value => ValueObjectList<Photo>.Deserialize(value));
         
-        /*builder.OwnsOne(x => x.PhotosContainer, ownsBuilder =>
+        builder.Property(p => p.Requisites)
+            .IsRequired(false)
+            .HasConversion(
+                p => p == null ? string.Empty : p.Serialize(),
+                value => ValueObjectList<Requisite>.Deserialize(value));
+
+        /*builder.OwnsOne(x => x.Photos, ownsBuilder =>
         {
             ownsBuilder.ToJson();
-            
-            ownsBuilder.OwnsMany(x => x.Photos, photoBuilder =>
+
+            ownsBuilder.OwnsMany(x => x.Values, photoBuilder =>
             {
                 photoBuilder.Property(p => p.PathToStorage)
                     .IsRequired()
                     .HasMaxLength(Constants.MaxLengthLowText);
             });
-        });*/
+        });
         
-        builder.OwnsOne(x => x.RequisitesContainer, ownsBuilder =>
+        builder.OwnsOne(x => x.Requisites, ownsBuilder =>
         {
             ownsBuilder.ToJson();
 
-            ownsBuilder.OwnsMany(p => p.Requisites, reqBuilder =>
+            ownsBuilder.OwnsMany(p => p.Values, reqBuilder =>
             {
                 reqBuilder.Property(p => p.Name)
                     .IsRequired()
@@ -66,7 +72,7 @@ public class PetConfiguration : AuditEntityConfiguration<Pet>
                     .IsRequired()
                     .HasMaxLength(Constants.MaxLengthMediumText);
             });
-        });
+        });*/
         
         builder.ComplexProperty(x => x.Description, propertyBuilder =>
         {

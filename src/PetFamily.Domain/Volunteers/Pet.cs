@@ -52,8 +52,8 @@ public class Pet : AuditEntity<PetId>, ISoftDelete
 
     //NotRequired
     public Address? Address { get; private set; }
-    public PhotosContainer? PhotosContainer { get; private set; }
-    public RequisitesContainer? RequisitesContainer { get; private set; }
+    public ValueObjectList<Photo>? Photos { get; private set; }
+    public ValueObjectList<Requisite>? Requisites { get; private set; }
     public Description? Description { get; private set; }
     public string? Color { get; private set; }
     
@@ -91,8 +91,8 @@ public class Pet : AuditEntity<PetId>, ISoftDelete
     
     public void AddPhotos(IEnumerable<Photo> photos)
     {
-        var addedPhotos = PhotosContainer?.Photos.ToList() ?? [];
+        var addedPhotos = Photos?.ToList() ?? [];
         addedPhotos.AddRange(photos);
-        PhotosContainer = new PhotosContainer(addedPhotos);
+        Photos = new ValueObjectList<Photo>(addedPhotos);
     }
 }
